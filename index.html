@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Registro PDV">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>Registro PDV</title>
+
+<style>
+  :root {
+    --bg: #FFFFFF;
+    --surface: #F5F5F7;
+    --elevated: #FBFBFD;
+    --text: #1D1D1F;
+    --text-2: #86868B;
+    --accent: #0071E3;
+    --accent-press: #0058B9;
+    --border: rgba(0,0,0,0.06);
+    --border-strong: rgba(0,0,0,0.12);
+    --ok: #17853F;
+    --warn: #B25000;
+    --err: #C4362B;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+    --ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+    --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --safe-b: env(safe-area-inset-bottom, 0px);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #000000;
+      --surface: #1C1C1E;
+      --elevated: #2C2C2E;
+      --text: #F5F5F7;
+      --text-2: #A1A1A6;
+      --accent: #2997FF;
+      --accent-press: #0071E3;
+      --border: rgba(255,255,255,0.08);
+      --border-strong: rgba(255,255,255,0.16);
+      --ok: #34C759;
+      --warn: #FF9F0A;
+      --err: #FF6B5E;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+      --shadow-lg: 0 8px 30px rgba(0,0,0,0.5);
+    }
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.47;
+    letter-spacing: -0.022em;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior-y: contain;
+  }
+
+  body { min-height: 100dvh; display: flex; flex-direction: column; }
+
+  /* ---------- topo ---------- */
+
+  .topbar {
+    position: sticky; top: 0; z-index: 20;
+    padding: max(env(safe-area-inset-top, 0px), 12px) 20px 12px;
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .who { min-width: 0; }
+  .who .nome {
+    font-size: 17px; font-weight: 600; letter-spacing: -0.022em;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .who .sub { font-size: 12px; color: var(--text-2); letter-spacing: 0; }
+
+  .net {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; color: var(--text-2); white-space: nowrap;
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); }
+  .dot.off { background: var(--warn); }
+
+  /* ---------- conteudo ---------- */
+
+  main { flex: 1; padding: 24px 20px 0; }
+
+  .stage { display: none; animation: fade .4s var(--ease); }
+  .stage.on { display: block; }
+
+  @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  h1 {
+    font-size: 32px; font-weight: 600; line-height: 1.125; letter-spacing: -0.005em;
+    margin: 0 0 8px; text-wrap: balance;
+  }
+  .lede { font-size: 17px; color: var(--text-2); margin: 0 0 28px; }
+
+  /* ---------- busca de PDV ---------- */
+
+  .field {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0 14px;
+    transition: border-color .2s var(--ease), box-shadow .2s var(--ease);
+  }
+  .field:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 15%, transparent);
+  }
+  .field svg { flex: none; color: var(--text-2); }
+  .field input {
+    flex: 1; min-width: 0;
+    background: none; border: none; outline: none;
+    color: var(--text);
+    font: inherit; font-size: 17px;
+    padding: 14px 0;
+  }
+  .field input::placeholder { color: var(--text-2); }
+
+  .lista { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+
+  .pdv {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    width: 100%; text-align: left;
+    background: var(--elevated);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+    padding: 14px 16px;
+    color: var(--text);
+    font: inherit;
+    cursor: pointer;
+    transition: transform .15s var(--ease), border-color .2s var(--ease);
+  }
+  .pdv:active { transform: scale(0.985); border-color: var(--border-strong); }
+  .pdv > span:first-child { min-width: 0; }
+  .pdv .n { display: block; font-weight: 600; font-size: 17px; }
+  .pdv .d { display: block; font-size: 14px; color: var(--text-2); letter-spacing: -0.016em; margin-top: 1px; }
+  .pdv .chev { color: var(--text-2); flex: none; }
+
+  .vazio {
+    text-align: center; color: var(--text-2);
+    font-size: 15px; padding: 40px 20px;
+  }
+
+  /* ---------- captura ---------- */
+
+  .local-card {
+    background: var(--elevated);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+    padding: 16px 18px;
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    margin-bottom: 28px;
+  }
+  .local-card .rot {
+    font-size: 12px; color: var(--text-2);
+    text-transform: uppercase; letter-spacing: .06em;
+    margin-bottom: 2px;
+  }
+  .local-card .val { font-weight: 600; font-size: 17px; }
+  .trocar {
+    background: none; border: none; padding: 8px;
+    margin: -8px -8px -8px 0;
+    color: var(--accent); font: inherit; font-size: 15px; font-weight: 500;
+    cursor: pointer; flex: none;
+  }
+  .trocar:active { opacity: .55; }
+
+  .contador { text-align: center; margin: 40px 0 36px; }
+  .contador .num {
+    font-size: 80px; font-weight: 700; line-height: 1;
+    letter-spacing: -0.015em;
+    font-variant-numeric: tabular-nums;
+    transition: transform .4s var(--spring);
+  }
+  .contador .num.pop { transform: scale(1.12); }
+  .contador .lbl { font-size: 17px; color: var(--text-2); margin-top: 6px; }
+
+  .thumbs {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .thumb {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    animation: pop .35s var(--spring);
+  }
+  @keyframes pop { from { opacity: 0; transform: scale(.86); } to { opacity: 1; transform: none; } }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .thumb .st {
+    position: absolute; right: 5px; bottom: 5px;
+    width: 18px; height: 18px; border-radius: 50%;
+    display: grid; place-items: center;
+    background: rgba(0,0,0,.55);
+    backdrop-filter: blur(6px);
+  }
+  .thumb.enviando .st::after {
+    content: ""; width: 9px; height: 9px;
+    border: 1.6px solid rgba(255,255,255,.35);
+    border-top-color: #fff; border-radius: 50%;
+    animation: spin .7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .thumb.ok .st { background: var(--ok); }
+  .thumb.ok .st::after {
+    content: ""; width: 4px; height: 8px;
+    border: solid #fff; border-width: 0 1.8px 1.8px 0;
+    transform: rotate(43deg) translate(-1px,-1px);
+  }
+  .thumb.erro .st { background: var(--err); }
+  .thumb.erro .st::after { content: "!"; color: #fff; font-size: 11px; font-weight: 700; }
+
+  /* ---------- rodape fixo ---------- */
+
+  .dock {
+    position: sticky; bottom: 0;
+    padding: 12px 20px calc(12px + var(--safe-b));
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-top: 1px solid var(--border);
+  }
+
+  .btn {
+    display: flex; align-items: center; justify-content: center; gap: 9px;
+    width: 100%;
+    background: var(--accent); color: #fff;
+    border: none; border-radius: 980px;
+    padding: 17px 24px;
+    font: inherit; font-size: 17px; font-weight: 600; letter-spacing: -0.022em;
+    cursor: pointer;
+    transition: transform .15s var(--ease), background-color .2s var(--ease);
+  }
+  .btn:active { transform: scale(.975); background: var(--accent-press); }
+  .btn[disabled] { opacity: .4; pointer-events: none; }
+  .btn.ghost {
+    background: none; color: var(--accent);
+    border: 1px solid var(--border-strong);
+    margin-top: 8px; padding: 15px 24px; font-size: 16px;
+  }
+  .btn.ghost:active { background: var(--surface); }
+
+  /* ---------- final ---------- */
+
+  .done { text-align: center; padding: 56px 0 24px; }
+  .selo {
+    width: 76px; height: 76px; margin: 0 auto 24px;
+    border-radius: 50%;
+    background: var(--ok);
+    display: grid; place-items: center;
+    animation: pop .5s var(--spring);
+  }
+  .selo::after {
+    content: ""; width: 20px; height: 36px;
+    border: solid #fff; border-width: 0 4px 4px 0;
+    transform: rotate(43deg) translate(-2px,-3px);
+  }
+
+  /* ---------- avisos ---------- */
+
+  .aviso {
+    display: flex; gap: 11px; align-items: flex-start;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 13px 15px;
+    font-size: 14px; line-height: 1.43; letter-spacing: -0.016em;
+    color: var(--text-2);
+    margin-bottom: 20px;
+  }
+  .aviso b { color: var(--text); font-weight: 600; }
+  .aviso .ic { flex: none; margin-top: 1px; }
+  .aviso.alerta { border-color: color-mix(in srgb, var(--warn) 35%, var(--border)); }
+  .aviso.alerta .ic { color: var(--warn); }
+
+  .erro-box {
+    text-align: center; padding: 64px 24px;
+  }
+  .erro-box h1 { font-size: 28px; }
+
+  #file { display: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="who">
+    <div class="nome" id="pNome">Carregando…</div>
+    <div class="sub" id="pSub">Registro de PDV</div>
+  </div>
+  <div class="net"><span class="dot" id="netDot"></span><span id="netTxt">Online</span></div>
+</div>
+
+<main>
+
+  <!-- ETAPA 0: carregando / erro -->
+  <section class="stage on" id="stLoad">
+    <div class="vazio">Carregando seus dados…</div>
+  </section>
+
+  <section class="stage" id="stErro">
+    <div class="erro-box">
+      <h1>Link inválido</h1>
+      <p class="lede" id="erroMsg">Esse link não está ativo. Fale com a equipe da FullTime para receber o seu.</p>
+    </div>
+  </section>
+
+  <!-- ETAPA 1: escolher PDV -->
+  <section class="stage" id="stPdv">
+    <h1>Onde você está?</h1>
+    <p class="lede">Escolha a loja para começar o registro.</p>
+
+    <div class="field">
+      <svg width="17" height="17" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <circle cx="7" cy="7" r="5.2" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M11 11l3.4 3.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <input id="busca" type="search" placeholder="Buscar loja ou código" autocomplete="off" enterkeyhint="search">
+    </div>
+
+    <div class="lista" id="listaPdv"></div>
+  </section>
+
+  <!-- ETAPA 2: capturar -->
+  <section class="stage" id="stFoto">
+    <div class="local-card">
+      <div>
+        <div class="rot">Loja</div>
+        <div class="val" id="pdvNome">—</div>
+      </div>
+      <button class="trocar" id="btnTrocar" type="button">Trocar</button>
+    </div>
+
+    <div class="aviso" id="avisoGps">
+      <svg class="ic" width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <circle cx="8" cy="8" r="6.3" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M8 5v3.4l2.2 1.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <div id="gpsTxt">Obtendo localização…</div>
+    </div>
+
+    <div class="contador">
+      <div class="num" id="cont">0</div>
+      <div class="lbl" id="contLbl">foto registrada</div>
+    </div>
+
+    <div class="thumbs" id="thumbs"></div>
+  </section>
+
+  <!-- ETAPA 3: concluido -->
+  <section class="stage" id="stFim">
+    <div class="done">
+      <div class="selo"></div>
+      <h1 id="fimTitulo">Visita registrada</h1>
+      <p class="lede" id="fimTexto">—</p>
+    </div>
+  </section>
+
+</main>
+
+<div class="dock" id="dock" style="display:none">
+  <button class="btn" id="btnFoto" type="button">
+    <svg width="19" height="19" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <path d="M2.6 6.4h2.9l1.3-2h6.4l1.3 2h2.9a1 1 0 011 1v8.2a1 1 0 01-1 1H2.6a1 1 0 01-1-1V7.4a1 1 0 011-1z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+      <circle cx="10" cy="11.3" r="3.1" stroke="currentColor" stroke-width="1.6"/>
+    </svg>
+    Tirar foto
+  </button>
+  <button class="btn ghost" id="btnFim" type="button">Encerrar visita</button>
+</div>
+
+<input id="file" type="file" accept="image/*" capture="environment" multiple>
+
+<script>
+/* =====================================================================
+   Registro PDV — PWA do promotor
+   Vanilla, sem build. Fala apenas com o n8n; nenhuma credencial aqui.
+   ===================================================================== */
+
+const API = {
+  // ajuste apenas se os paths do n8n mudarem
+  sessao: 'https://flow.eduardolessa.online/webhook/pwa/sessao',
+  upload: 'https://flow.eduardolessa.online/webhook/pwa/upload',
+  fechar: 'https://flow.eduardolessa.online/webhook/pwa/fechar'
+};
+
+const $ = id => document.getElementById(id);
+const token = new URLSearchParams(location.search).get('t') || localStorage.getItem('pdv_token') || '';
+
+let promotor = null;
+let pdvs = [];
+let pdvAtual = null;
+let coords = null;
+let enviadas = 0;
+let fila = [];
+let processando = false;
+
+/* ---------- navegacao entre etapas ---------- */
+
+function etapa(id) {
+  document.querySelectorAll('.stage').forEach(s => s.classList.toggle('on', s.id === id));
+  $('dock').style.display = (id === 'stFoto') ? '' : 'none';
+}
+
+/* ---------- rede ---------- */
+
+function pintarRede() {
+  const on = navigator.onLine;
+  $('netDot').classList.toggle('off', !on);
+  $('netTxt').textContent = on
+    ? (fila.length ? `Enviando ${fila.length}` : 'Online')
+    : (fila.length ? `${fila.length} na fila` : 'Sem sinal');
+}
+addEventListener('online',  () => { pintarRede(); bombear(); });
+addEventListener('offline', pintarRede);
+
+/* ---------- persistencia da fila (sobrevive a fechar o app) ---------- */
+
+const DB = 'registro-pdv', LOJA = 'fila';
+function abrirDB() {
+  return new Promise((ok, err) => {
+    const r = indexedDB.open(DB, 1);
+    r.onupgradeneeded = () => r.result.createObjectStore(LOJA, { keyPath: 'id' });
+    r.onsuccess = () => ok(r.result);
+    r.onerror = () => err(r.error);
+  });
+}
+async function salvarItem(item) {
+  try {
+    const db = await abrirDB();
+    db.transaction(LOJA, 'readwrite').objectStore(LOJA).put(item);
+  } catch (e) { /* modo privado: segue sem persistir */ }
+}
+async function removerItem(id) {
+  try {
+    const db = await abrirDB();
+    db.transaction(LOJA, 'readwrite').objectStore(LOJA).delete(id);
+  } catch (e) {}
+}
+async function recuperarFila() {
+  try {
+    const db = await abrirDB();
+    return await new Promise(ok => {
+      const req = db.transaction(LOJA).objectStore(LOJA).getAll();
+      req.onsuccess = () => ok(req.result || []);
+      req.onerror = () => ok([]);
+    });
+  } catch (e) { return []; }
+}
+
+/* ---------- sessao ---------- */
+
+async function iniciar() {
+  if (!token) return falhar('Esse link não tem identificação. Peça o seu link para a equipe da FullTime.');
+  localStorage.setItem('pdv_token', token);
+
+  try {
+    const r = await fetch(API.sessao, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token })
+    });
+    if (!r.ok) throw new Error('http ' + r.status);
+    const d = await r.json();
+    if (!d || !d.promotor) throw new Error('sem promotor');
+
+    promotor = d.promotor;
+    pdvs = d.pdvs || [];
+
+    $('pNome').textContent = promotor.nome;
+    $('pSub').textContent = d.marca || 'Registro de PDV';
+
+    // retoma sessao do dia, se o n8n disser que existe
+    if (d.sessao && d.sessao.pdv_id) {
+      const p = pdvs.find(x => x.id === d.sessao.pdv_id);
+      if (p) { escolherPdv(p, d.sessao.fotos || 0); return; }
+    }
+    render(pdvs);
+    etapa('stPdv');
+  } catch (e) {
+    falhar('Não consegui carregar seus dados. Verifique a conexão e tente de novo.');
+  }
+
+  const guardadas = await recuperarFila();
+  if (guardadas.length) { fila = guardadas; pintarRede(); bombear(); }
+}
+
+function falhar(msg) { $('erroMsg').textContent = msg; etapa('stErro'); }
+
+/* ---------- lista de PDV ---------- */
+
+function render(lista) {
+  const box = $('listaPdv');
+  box.innerHTML = '';
+  if (!lista.length) {
+    box.innerHTML = '<div class="vazio">Nenhuma loja encontrada.<br>Tente outro nome ou o código.</div>';
+    return;
+  }
+  lista.slice(0, 40).forEach(p => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'pdv';
+    const det = [p.rede, p.cidade && p.uf ? `${p.cidade} · ${p.uf}` : p.cidade].filter(Boolean).join(' · ');
+    b.innerHTML = `<span><span class="n"></span><span class="d"></span></span>
+      <svg class="chev" width="8" height="13" viewBox="0 0 8 13" fill="none" aria-hidden="true">
+        <path d="M1.5 1.5L6.5 6.5L1.5 11.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    b.querySelector('.n').textContent = p.nome;
+    b.querySelector('.d').textContent = det;
+    b.onclick = () => escolherPdv(p, 0);
+    box.appendChild(b);
+  });
+}
+
+$('busca').addEventListener('input', e => {
+  const q = e.target.value.trim().toLowerCase();
+  if (!q) return render(pdvs);
+  render(pdvs.filter(p =>
+    (p.nome || '').toLowerCase().includes(q) ||
+    (p.cidade || '').toLowerCase().includes(q) ||
+    (p.rede || '').toLowerCase().includes(q) ||
+    String(p.codigo || '').toLowerCase().includes(q)
+  ));
+});
+
+function escolherPdv(p, jaFeitas) {
+  pdvAtual = p;
+  enviadas = jaFeitas || 0;
+  $('pdvNome').textContent = p.nome;
+  $('thumbs').innerHTML = '';
+  pintarContador();
+  etapa('stFoto');
+  pedirGps();
+}
+
+$('btnTrocar').onclick = () => { $('busca').value = ''; render(pdvs); etapa('stPdv'); };
+
+/* ---------- gps ---------- */
+
+function pedirGps() {
+  if (!navigator.geolocation) { $('gpsTxt').textContent = 'Este aparelho não informa localização.'; return; }
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      coords = { lat: pos.coords.latitude, lng: pos.coords.longitude, precisao: Math.round(pos.coords.accuracy) };
+      $('avisoGps').classList.remove('alerta');
+      $('gpsTxt').innerHTML = `<b>Localização confirmada</b> · precisão de ${coords.precisao} m`;
+    },
+    () => {
+      coords = null;
+      $('avisoGps').classList.add('alerta');
+      $('gpsTxt').innerHTML = '<b>Sem localização</b> · as fotos são registradas mesmo assim, mas sem comprovação de presença.';
+    },
+    { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 }
+  );
+}
+
+/* ---------- captura ---------- */
+
+$('btnFoto').onclick = () => $('file').click();
+
+$('file').addEventListener('change', e => {
+  [...e.target.files].forEach(enfileirar);
+  e.target.value = '';
+});
+
+function enfileirar(arquivo) {
+  const id = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+  const el = document.createElement('div');
+  el.className = 'thumb enviando';
+  el.id = 'th-' + id;
+  el.innerHTML = '<img alt=""><span class="st"></span>';
+  const url = URL.createObjectURL(arquivo);
+  el.querySelector('img').src = url;
+  $('thumbs').prepend(el);
+
+  const item = {
+    id, arquivo,
+    token,
+    pdv_id: pdvAtual.id,
+    lat: coords ? coords.lat : null,
+    lng: coords ? coords.lng : null,
+    precisao: coords ? coords.precisao : null,
+    capturada_em: new Date().toISOString(),
+    tentativas: 0
+  };
+  fila.push(item);
+  salvarItem(item);
+  pintarRede();
+  bombear();
+}
+
+async function bombear() {
+  if (processando || !fila.length || !navigator.onLine) return;
+  processando = true;
+
+  while (fila.length && navigator.onLine) {
+    const item = fila[0];
+    try {
+      const fd = new FormData();
+      fd.append('foto', item.arquivo, 'foto.jpg');
+      fd.append('token', item.token);
+      fd.append('pdv_id', item.pdv_id);
+      fd.append('origem', 'pwa');
+      if (item.lat != null) { fd.append('lat', item.lat); fd.append('lng', item.lng); }
+      if (item.precisao != null) fd.append('precisao', item.precisao);
+      fd.append('capturada_em', item.capturada_em);
+
+      const r = await fetch(API.upload, { method: 'POST', body: fd });
+      if (!r.ok) throw new Error('http ' + r.status);
+
+      fila.shift();
+      removerItem(item.id);
+      marcar(item.id, 'ok');
+      enviadas++;
+      pintarContador(true);
+    } catch (e) {
+      item.tentativas++;
+      if (item.tentativas >= 4) {
+        fila.shift();
+        removerItem(item.id);
+        marcar(item.id, 'erro');
+      } else {
+        await new Promise(r => setTimeout(r, 1200 * item.tentativas));
+      }
+      break;
+    }
+    pintarRede();
+  }
+
+  processando = false;
+  pintarRede();
+  if (fila.length && navigator.onLine) setTimeout(bombear, 2500);
+}
+
+function marcar(id, estado) {
+  const el = $('th-' + id);
+  if (el) el.className = 'thumb ' + estado;
+}
+
+function pintarContador(animar) {
+  const n = $('cont');
+  n.textContent = enviadas;
+  $('contLbl').textContent = enviadas === 1 ? 'foto registrada' : 'fotos registradas';
+  if (animar) { n.classList.add('pop'); setTimeout(() => n.classList.remove('pop'), 400); }
+}
+
+/* ---------- encerrar ---------- */
+
+$('btnFim').onclick = async () => {
+  if (fila.length) {
+    if (!confirm(`Ainda faltam ${fila.length} foto(s) para enviar. Encerrar assim mesmo?`)) return;
+  }
+  try {
+    await fetch(API.fechar, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token, pdv_id: pdvAtual.id })
+    });
+  } catch (e) { /* o fechamento automatico do n8n cobre esse caso */ }
+
+  $('fimTitulo').textContent = enviadas ? 'Visita registrada' : 'Visita encerrada';
+  $('fimTexto').textContent = enviadas
+    ? `${enviadas} ${enviadas === 1 ? 'foto enviada' : 'fotos enviadas'} de ${pdvAtual.nome}.`
+    : 'Nenhuma foto foi enviada nesta visita.';
+  etapa('stFim');
+  setTimeout(() => { $('busca').value = ''; render(pdvs); etapa('stPdv'); }, 3200);
+};
+
+/* ---------- service worker ---------- */
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+
+pintarRede();
+iniciar();
+</script>
+</body>
+</html>
