@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<title>Curadoria do Relatório</title>
+
+<style>
+  :root {
+    --bg: #FFFFFF; --surface: #F5F5F7; --elevated: #FBFBFD;
+    --text: #1D1D1F; --text-2: #86868B;
+    --accent: #0071E3; --accent-press: #0058B9;
+    --border: rgba(0,0,0,0.06); --border-strong: rgba(0,0,0,0.12);
+    --ok: #17853F; --ok-bg: rgba(23,133,63,.10);
+    --warn: #B25000; --warn-bg: rgba(178,80,0,.10);
+    --err: #C4362B;
+    --campanha: #7B5BC4; --campanha-bg: rgba(123,91,196,.12);
+    --conquista: #0E7C86; --conquista-bg: rgba(14,124,134,.12);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+    --ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+    --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #000000; --surface: #1C1C1E; --elevated: #2C2C2E;
+      --text: #F5F5F7; --text-2: #A1A1A6;
+      --accent: #2997FF; --accent-press: #0071E3;
+      --border: rgba(255,255,255,0.08); --border-strong: rgba(255,255,255,0.18);
+      --ok: #34C759; --ok-bg: rgba(52,199,89,.14);
+      --warn: #FF9F0A; --warn-bg: rgba(255,159,10,.14);
+      --err: #FF6B5E;
+      --campanha: #A98BE8; --campanha-bg: rgba(169,139,232,.16);
+      --conquista: #4FC5CE; --conquista-bg: rgba(79,197,206,.16);
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+      --shadow-lg: 0 8px 30px rgba(0,0,0,0.5);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 17px; line-height: 1.47; letter-spacing: -0.022em;
+    -webkit-font-smoothing: antialiased;
+  }
+  button, input, select, textarea { font: inherit; }
+
+  /* ---------- login ---------- */
+  #login { min-height: 100dvh; display: grid; place-items: center; padding: 28px; }
+  .card-login {
+    width: 100%; max-width: 400px; background: var(--elevated);
+    border: 1px solid var(--border); border-radius: 18px;
+    box-shadow: var(--shadow-lg); padding: 40px 36px;
+  }
+  .card-login h1 { font-size: 30px; font-weight: 600; letter-spacing: -0.005em; margin: 0 0 6px; }
+  .card-login .sub { color: var(--text-2); font-size: 15px; margin: 0 0 30px; }
+  label { display: block; font-size: 12px; color: var(--text-2); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 7px; }
+  .inp {
+    width: 100%; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 13px 15px; color: var(--text); outline: none;
+    transition: border-color .2s var(--ease), box-shadow .2s var(--ease);
+  }
+  .inp:focus { border-color: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 15%, transparent); }
+  .campo { margin-bottom: 18px; }
+  .msg-erro { color: var(--err); font-size: 14px; margin-top: 14px; min-height: 20px; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    background: var(--accent); color: #fff; border: none; border-radius: 980px;
+    padding: 12px 24px; font-size: 15px; font-weight: 600; letter-spacing: -0.022em;
+    cursor: pointer; transition: transform .15s var(--ease), background-color .2s var(--ease), opacity .2s var(--ease);
+  }
+  .btn:hover { background: var(--accent-press); }
+  .btn:active { transform: scale(.975); }
+  .btn[disabled] { opacity: .4; pointer-events: none; }
+  .btn.full { width: 100%; padding: 13px 26px; font-size: 16px; }
+  .btn.sutil {
+    background: none; color: var(--accent); border: 1px solid var(--border-strong);
+    padding: 8px 16px; font-size: 14px;
+  }
+  .btn.sutil:hover { background: var(--surface); }
+
+  /* ---------- app ---------- */
+  #app { display: none; height: 100dvh; grid-template-rows: auto 1fr; }
+
+  header.topo {
+    border-bottom: 1px solid var(--border);
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    padding: 12px 24px;
+    display: flex; align-items: center; justify-content: space-between; gap: 20px;
+  }
+  .marca { display: flex; align-items: baseline; gap: 12px; min-width: 0; }
+  .marca .tt { font-size: 19px; font-weight: 600; letter-spacing: -0.022em; white-space: nowrap; }
+  .abas { display: flex; gap: 2px; background: var(--surface); border-radius: 980px; padding: 3px; }
+  .abas a {
+    text-decoration: none; color: var(--text-2); font-size: 14px; font-weight: 500;
+    padding: 6px 14px; border-radius: 980px; letter-spacing: -0.016em;
+    transition: background-color .2s var(--ease), color .2s var(--ease);
+  }
+  .abas a.on { background: var(--bg); color: var(--text); box-shadow: var(--shadow-sm); }
+  .topo-dir { display: flex; align-items: center; gap: 10px; }
+  select.mes {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 980px;
+    padding: 8px 14px; color: var(--text); font-size: 14px; outline: none;
+  }
+  .quem { font-size: 14px; color: var(--text-2); }
+
+  .corpo { display: grid; grid-template-columns: 268px 1fr; min-height: 0; }
+
+  /* ---------- lista de promotores ---------- */
+  aside {
+    border-right: 1px solid var(--border);
+    overflow-y: auto; padding: 14px 12px 40px;
+    background: var(--bg);
+  }
+  .aside-rot {
+    font-size: 12px; color: var(--text-2); text-transform: uppercase;
+    letter-spacing: .06em; padding: 6px 12px 10px;
+  }
+  .prom {
+    width: 100%; text-align: left; background: none; border: none;
+    padding: 11px 12px; border-radius: 10px; cursor: pointer; color: var(--text);
+    display: block; margin-bottom: 2px;
+    transition: background-color .18s var(--ease);
+  }
+  .prom:hover { background: var(--surface); }
+  .prom.on { background: var(--surface); }
+  .prom .l1 { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+  .prom .nome { font-size: 15px; font-weight: 600; letter-spacing: -0.016em; }
+  .prom .cont { font-size: 12px; color: var(--text-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .prom .praca { font-size: 12.5px; color: var(--text-2); margin-top: 1px; }
+  .barra { height: 3px; background: var(--border); border-radius: 3px; margin-top: 7px; overflow: hidden; }
+  .barra i { display: block; height: 100%; background: var(--ok); transition: width .4s var(--ease); }
+  .barra i.parcial { background: var(--warn); }
+
+  /* ---------- painel de trabalho ---------- */
+  main { overflow-y: auto; padding: 20px 24px 120px; min-height: 0; }
+
+  .cab {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 20px; flex-wrap: wrap; margin-bottom: 18px;
+  }
+  .cab h2 { font-size: 27px; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 2px; }
+  .cab .sub { font-size: 14px; color: var(--text-2); }
+
+  .lote {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    background: var(--elevated); border: 1px solid var(--border);
+    border-radius: 12px; padding: 10px 14px; margin-bottom: 18px;
+    box-shadow: var(--shadow-sm);
+    position: sticky; top: 0; z-index: 10;
+  }
+  .lote .qtd { font-size: 14px; font-weight: 600; margin-right: 4px; }
+  .lote select {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 7px 11px; color: var(--text); font-size: 14px; outline: none;
+  }
+  .lote .espaco { flex: 1; }
+  .dica {
+    font-size: 12.5px; color: var(--text-2); letter-spacing: -0.01em;
+  }
+  .dica kbd {
+    font-family: inherit; font-size: 11.5px; background: var(--surface);
+    border: 1px solid var(--border-strong); border-bottom-width: 2px;
+    border-radius: 5px; padding: 1px 5px; margin: 0 1px;
+  }
+
+  .grade {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(158px, 1fr));
+    gap: 12px; margin-bottom: 30px;
+  }
+  .cel {
+    position: relative; border-radius: 12px; overflow: hidden;
+    background: var(--surface); border: 2px solid transparent;
+    cursor: pointer; transition: border-color .18s var(--ease), transform .18s var(--ease);
+  }
+  .cel:hover { transform: translateY(-2px); }
+  .cel.sel { border-color: var(--accent); }
+  .cel.foco { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent); }
+  .cel.arrastando { opacity: .4; }
+  .cel .img { aspect-ratio: 3/4; background: var(--surface); }
+  .cel .img img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0; transition: opacity .35s var(--ease); }
+  .cel .img img.pronta { opacity: 1; }
+  .cel.fora .img { filter: grayscale(1) brightness(.72); }
+
+  .marca-sel {
+    position: absolute; top: 8px; left: 8px;
+    width: 21px; height: 21px; border-radius: 50%;
+    border: 2px solid rgba(255,255,255,.9);
+    background: rgba(0,0,0,.32); backdrop-filter: blur(6px);
+    display: grid; place-items: center;
+  }
+  .cel.sel .marca-sel { background: var(--accent); border-color: var(--accent); }
+  .cel.sel .marca-sel::after {
+    content: ""; width: 5px; height: 9px; border: solid #fff;
+    border-width: 0 2px 2px 0; transform: rotate(43deg) translate(-1px,-1px);
+  }
+
+  .cel .rodape {
+    padding: 7px 8px 8px; background: var(--elevated);
+    border-top: 1px solid var(--border);
+  }
+  .cel .pdv {
+    font-size: 11.5px; font-weight: 600; letter-spacing: 0;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    margin-bottom: 5px;
+  }
+  .cel select.tipo {
+    width: 100%; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 7px; padding: 4px 6px; color: var(--text);
+    font-size: 12px; outline: none; cursor: pointer;
+  }
+  .cel select.tipo.campanha  { background: var(--campanha-bg);  border-color: color-mix(in srgb, var(--campanha) 40%, transparent); color: var(--campanha); }
+  .cel select.tipo.conquista { background: var(--conquista-bg); border-color: color-mix(in srgb, var(--conquista) 40%, transparent); color: var(--conquista); }
+
+  .hora {
+    position: absolute; top: 8px; right: 8px;
+    font-size: 10.5px; color: #fff; letter-spacing: 0;
+    background: rgba(0,0,0,.5); backdrop-filter: blur(6px);
+    padding: 2px 6px; border-radius: 980px;
+  }
+
+  /* ---------- descrições ---------- */
+  .secao-desc {
+    background: var(--elevated); border: 1px solid var(--border);
+    border-radius: 14px; padding: 18px 20px; margin-bottom: 14px;
+    box-shadow: var(--shadow-sm);
+  }
+  .secao-desc .cab-d {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; margin-bottom: 10px;
+  }
+  .secao-desc h3 { font-size: 17px; font-weight: 600; margin: 0; letter-spacing: -0.022em; }
+  .secao-desc .n { font-size: 13px; color: var(--text-2); font-variant-numeric: tabular-nums; }
+  .secao-desc textarea {
+    width: 100%; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 13px; color: var(--text);
+    font-size: 15px; line-height: 1.45; resize: vertical; min-height: 46px; outline: none;
+    transition: border-color .2s var(--ease);
+  }
+  .secao-desc textarea:focus { border-color: var(--accent); }
+  .secao-desc .acoes-d { display: flex; align-items: center; gap: 10px; margin-top: 9px; }
+
+  .pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 12px; font-weight: 500; padding: 3px 10px; border-radius: 980px;
+  }
+  .pill.campanha  { background: var(--campanha-bg);  color: var(--campanha); }
+  .pill.conquista { background: var(--conquista-bg); color: var(--conquista); }
+
+  .nada { text-align: center; padding: 80px 24px; color: var(--text-2); }
+  .nada h3 { font-size: 21px; color: var(--text); margin: 0 0 6px; font-weight: 600; }
+  .nada p { margin: 0; font-size: 15px; }
+
+  /* ---------- barra de salvamento ---------- */
+  .salvando {
+    position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: var(--elevated); border: 1px solid var(--border);
+    box-shadow: var(--shadow-lg); border-radius: 980px;
+    padding: 10px 20px; font-size: 14px; color: var(--text);
+    display: flex; align-items: center; gap: 9px; z-index: 50;
+    transition: transform .3s var(--spring), opacity .2s var(--ease);
+    opacity: 0; pointer-events: none;
+  }
+  .salvando.on { transform: translateX(-50%) translateY(0); opacity: 1; }
+  .salvando .pt { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); }
+  .salvando.erro .pt { background: var(--err); }
+
+  @media (max-width: 860px) {
+    .corpo { grid-template-columns: 1fr; }
+    aside { display: none; }
+    aside.aberta { display: block; position: fixed; inset: 56px 0 0 0; z-index: 30; }
+  }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+
+<div id="login">
+  <div class="card-login">
+    <h1>Curadoria</h1>
+    <p class="sub">Seleção de fotos do Ação no Trade</p>
+    <form id="fLogin">
+      <div class="campo"><label for="email">E-mail</label><input class="inp" id="email" type="email" autocomplete="email" required></div>
+      <div class="campo"><label for="senha">Senha</label><input class="inp" id="senha" type="password" autocomplete="current-password" required></div>
+      <button class="btn full" type="submit" id="btnEntrar">Entrar</button>
+      <div class="msg-erro" id="erroLogin"></div>
+    </form>
+  </div>
+</div>
+
+<div id="app">
+  <header class="topo">
+    <div class="marca">
+      <span class="tt">Curadoria</span>
+      <nav class="abas">
+        <a href="./" >Ao vivo</a>
+        <a href="./curadoria.html" class="on">Curadoria</a>
+      </nav>
+    </div>
+    <div class="topo-dir">
+      <select class="mes" id="fMes"></select>
+      <span class="quem" id="quem"></span>
+      <button class="btn sutil" id="btnSair" type="button">Sair</button>
+    </div>
+  </header>
+
+  <div class="corpo">
+    <aside id="lista">
+      <div class="aside-rot">Promotores no período</div>
+      <div id="promotores"></div>
+    </aside>
+
+    <main id="area">
+      <div class="nada"><h3>Escolha um promotor</h3><p>A lista da esquerda mostra quantas fotos faltam revisar.</p></div>
+    </main>
+  </div>
+</div>
+
+<div class="salvando" id="toast"><span class="pt"></span><span id="toastTxt">Salvo</span></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+/* =====================================================================
+   Curadoria do Ação no Trade
+   A Ana seleciona o que entra, classifica o tipo, ajusta a frase de cada
+   secao e reordena. Nada entra no relatorio sem passar por aqui.
+   ===================================================================== */
+
+const CFG = {
+  supabaseUrl: 'https://tklbkycpghdiptzwkpcu.supabase.co',
+  supabaseKey: 'sb_publishable_fkwFuTd6vGWMXpg8bJe61A_Sel8kIrv',
+  urlsAssinadas: 'https://flow.eduardolessa.online/webhook/painel/urls'
+};
+
+const sb = supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey);
+const $ = id => document.getElementById(id);
+
+let perfil = null;
+let tipos = [];          // catalogo de acoes
+let promotores = [];     // com contadores do mes
+let atual = null;        // promotor selecionado
+let fotos = [];          // fotos do promotor no mes
+let marcadas = new Set();// selecao multipla para acao em lote
+let foco = -1;           // indice com foco de teclado
+let urls = {};
+
+/* ---------------- login ---------------- */
+
+$('fLogin').addEventListener('submit', async e => {
+  e.preventDefault();
+  $('btnEntrar').disabled = true;
+  $('erroLogin').textContent = '';
+  const { error } = await sb.auth.signInWithPassword({
+    email: $('email').value.trim(), password: $('senha').value
+  });
+  $('btnEntrar').disabled = false;
+  if (error) { $('erroLogin').textContent = 'E-mail ou senha incorretos.'; return; }
+  abrir();
+});
+
+$('btnSair').onclick = async () => { await sb.auth.signOut(); location.reload(); };
+sb.auth.getSession().then(({ data }) => { if (data.session) abrir(); });
+
+async function abrir() {
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) return;
+  const { data: p } = await sb.from('perfis').select('nome, papel, marca_id').eq('id', user.id).single();
+  perfil = p || { nome: user.email };
+  $('quem').textContent = perfil.nome;
+  $('login').style.display = 'none';
+  $('app').style.display = 'grid';
+
+  montarMeses();
+  const { data: t } = await sb.from('acoes').select('id, nome, secao, ordem').eq('ativo', true).order('ordem');
+  tipos = (t || []).filter(x => x.secao);
+  await carregarPromotores();
+}
+
+/* ---------------- periodo ---------------- */
+
+function montarMeses() {
+  const sel = $('fMes');
+  const hoje = new Date();
+  for (let i = 0; i < 12; i++) {
+    const d = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
+    const v = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`;
+    const r = d.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+    sel.add(new Option(r.charAt(0).toUpperCase() + r.slice(1), v));
+  }
+  sel.onchange = async () => { atual = null; await carregarPromotores(); pintarArea(); };
+}
+const mesSel = () => $('fMes').value;
+const fimMes = () => {
+  const [a, m] = mesSel().split('-').map(Number);
+  return new Date(a, m, 0).toISOString().slice(0, 10);
+};
+
+/* ---------------- promotores ---------------- */
+
+async function carregarPromotores() {
+  const { data } = await sb.from('vw_curadoria_status')
+    .select('*').eq('mes_referencia', mesSel());
+  promotores = (data || []).sort((a, b) => a.promotor_nome.localeCompare(b.promotor_nome, 'pt-BR'));
+  pintarPromotores();
+}
+
+function pintarPromotores() {
+  const box = $('promotores');
+  if (!promotores.length) {
+    box.innerHTML = '<div style="padding:14px 12px;color:var(--text-2);font-size:14px">Nenhuma foto neste mês.</div>';
+    return;
+  }
+  box.innerHTML = '';
+  promotores.forEach(p => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'prom' + (atual && atual.promotor_id === p.promotor_id ? ' on' : '');
+    const pct = p.fotos_recebidas ? Math.round(p.fotos_curadas / p.fotos_recebidas * 100) : 0;
+    b.innerHTML = `
+      <span class="l1"><span class="nome"></span><span class="cont">${p.fotos_curadas}/${p.fotos_recebidas}</span></span>
+      <span class="praca"></span>
+      <span class="barra"><i style="width:${pct}%" class="${pct < 100 ? 'parcial' : ''}"></i></span>`;
+    b.querySelector('.nome').textContent = p.promotor_nome;
+    b.querySelector('.praca').textContent = [p.praca, `${p.fotos_no_relatorio} no relatório`].filter(Boolean).join(' · ');
+    b.onclick = () => selecionar(p);
+    box.appendChild(b);
+  });
+}
+
+async function selecionar(p) {
+  atual = p;
+  marcadas.clear(); foco = -1;
+  pintarPromotores();
+  await carregarFotos();
+  pintarArea();
+}
+
+/* ---------------- fotos ---------------- */
+
+async function carregarFotos() {
+  const { data } = await sb.from('fotos')
+    .select(`id, r2_key_thumb, r2_key_original, capturada_em, criado_em, origem,
+             acao_id, selecionada, ordem_secao, curada_em,
+             visitas!inner ( id, data_visita, promotor_id, pdvs ( nome, nome_curto ) )`)
+    .eq('visitas.promotor_id', atual.promotor_id)
+    .gte('visitas.data_visita', mesSel())
+    .lte('visitas.data_visita', fimMes())
+    .eq('status', 'processada');
+
+  fotos = (data || []).sort((a, b) =>
+    (a.ordem_secao ?? 9999) - (b.ordem_secao ?? 9999) ||
+    new Date(a.capturada_em || a.criado_em) - new Date(b.capturada_em || b.criado_em));
+
+  await assinar();
+}
+
+async function assinar() {
+  const keys = fotos.map(f => f.r2_key_thumb || f.r2_key_original).filter(Boolean);
+  if (!keys.length) { urls = {}; return; }
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    const r = await fetch(CFG.urlsAssinadas, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+      body: JSON.stringify({ keys: [...new Set(keys)] })
+    });
+    urls = r.ok ? await r.json() : {};
+  } catch (e) { urls = {}; }
+}
+
+/* ---------------- render ---------------- */
+
+const secaoDe = id => (tipos.find(t => t.id === id) || {}).secao || null;
+const hora = iso => new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+function pintarArea() {
+  const area = $('area');
+  if (!atual) {
+    area.innerHTML = '<div class="nada"><h3>Escolha um promotor</h3><p>A lista da esquerda mostra quantas fotos faltam revisar.</p></div>';
+    return;
+  }
+  if (!fotos.length) {
+    area.innerHTML = `<div class="nada"><h3>Sem fotos neste mês</h3><p>${atual.promotor_nome} não registrou visitas no período.</p></div>`;
+    return;
+  }
+
+  const nSel = fotos.filter(f => f.selecionada).length;
+  const nCamp = fotos.filter(f => f.selecionada && secaoDe(f.acao_id) === 'campanha').length;
+  const nConq = fotos.filter(f => f.selecionada && secaoDe(f.acao_id) === 'conquista').length;
+
+  area.innerHTML = `
+    <div class="cab">
+      <div>
+        <h2></h2>
+        <div class="sub"></div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span class="pill campanha">${nCamp} em campanhas</span>
+        <span class="pill conquista">${nConq} em conquistas</span>
+      </div>
+    </div>
+
+    <div class="lote">
+      <span class="qtd" id="qtdMarc">Nenhuma marcada</span>
+      <select id="tipoLote"><option value="">Aplicar tipo…</option></select>
+      <button class="btn sutil" id="incluirLote" type="button">Incluir</button>
+      <button class="btn sutil" id="excluirLote" type="button">Excluir</button>
+      <span class="espaco"></span>
+      <span class="dica"><kbd>clique</kbd> inclui · <kbd>shift</kbd> marca em lote · <kbd>←</kbd><kbd>→</kbd> navega · <kbd>espaço</kbd> alterna · <kbd>1</kbd>–<kbd>9</kbd> tipo</span>
+    </div>
+
+    <div class="grade" id="grade"></div>
+
+    <div class="secao-desc" data-secao="campanha">
+      <div class="cab-d"><h3>Campanhas Alcançadas</h3><span class="n">${nCamp} ${nCamp === 1 ? 'foto' : 'fotos'}</span></div>
+      <textarea id="descCampanha" rows="2" placeholder="Frase que aparece abaixo do título no slide"></textarea>
+      <div class="acoes-d"><button class="btn sutil" data-sugerir="campanha" type="button">Sugerir a partir das fotos</button></div>
+    </div>
+
+    <div class="secao-desc" data-secao="conquista">
+      <div class="cab-d"><h3>Conquistas</h3><span class="n">${nConq} ${nConq === 1 ? 'foto' : 'fotos'}</span></div>
+      <textarea id="descConquista" rows="2" placeholder="Frase que aparece abaixo do título no slide"></textarea>
+      <div class="acoes-d"><button class="btn sutil" data-sugerir="conquista" type="button">Sugerir a partir das fotos</button></div>
+    </div>`;
+
+  area.querySelector('h2').textContent = atual.promotor_nome;
+  area.querySelector('.sub').textContent =
+    [atual.praca, `${fotos.length} recebidas`, `${nSel} no relatório`].filter(Boolean).join(' · ');
+
+  const tl = $('tipoLote');
+  tipos.forEach(t => tl.add(new Option(t.nome, t.id)));
+  tl.onchange = () => { if (tl.value) aplicarLote({ acao_id: tl.value }); tl.value = ''; };
+  $('incluirLote').onclick = () => aplicarLote({ selecionada: true });
+  $('excluirLote').onclick = () => aplicarLote({ selecionada: false });
+
+  area.querySelectorAll('[data-sugerir]').forEach(b => b.onclick = () => sugerir(b.dataset.sugerir));
+  $('descCampanha').onblur  = () => salvarDescricao('campanha',  $('descCampanha').value);
+  $('descConquista').onblur = () => salvarDescricao('conquista', $('descConquista').value);
+
+  pintarGrade();
+  carregarDescricoes();
+}
+
+function pintarGrade() {
+  const g = $('grade');
+  g.innerHTML = '';
+  fotos.forEach((f, i) => {
+    const sec = secaoDe(f.acao_id);
+    const d = document.createElement('div');
+    d.className = 'cel' + (f.selecionada ? ' sel' : ' fora') + (marcadas.has(f.id) ? ' foco' : '');
+    d.draggable = true;
+    d.dataset.i = i;
+
+    const pdv = (f.visitas && f.visitas.pdvs) || {};
+    const legenda = pdv.nome_curto || pdv.nome || 'PDV';
+
+    d.innerHTML = `
+      <div class="img"><img alt="" loading="lazy"></div>
+      <span class="marca-sel"></span>
+      <span class="hora">${hora(f.capturada_em || f.criado_em)}</span>
+      <div class="rodape">
+        <div class="pdv"></div>
+        <select class="tipo ${sec || ''}"><option value="">Sem tipo</option></select>
+      </div>`;
+
+    d.querySelector('.pdv').textContent = legenda;
+    const img = d.querySelector('img');
+    const src = urls[f.r2_key_thumb] || urls[f.r2_key_original];
+    if (src) { img.src = src; img.onload = () => img.classList.add('pronta'); }
+
+    const s = d.querySelector('select.tipo');
+    tipos.forEach(t => s.add(new Option(t.nome, t.id)));
+    s.value = f.acao_id || '';
+    s.onclick = e => e.stopPropagation();
+    s.onchange = () => definirTipo(f, s.value);
+
+    d.onclick = e => {
+      if (e.shiftKey) { marcadas.has(f.id) ? marcadas.delete(f.id) : marcadas.add(f.id); atualizarLote(); pintarGrade(); return; }
+      foco = i;
+      alternar(f);
+    };
+
+    d.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', i); d.classList.add('arrastando'); });
+    d.addEventListener('dragend',   () => d.classList.remove('arrastando'));
+    d.addEventListener('dragover',  e => e.preventDefault());
+    d.addEventListener('drop', e => {
+      e.preventDefault();
+      const de = Number(e.dataTransfer.getData('text/plain'));
+      if (Number.isNaN(de) || de === i) return;
+      const [item] = fotos.splice(de, 1);
+      fotos.splice(i, 0, item);
+      salvarOrdem();
+      pintarGrade();
+    });
+
+    g.appendChild(d);
+  });
+}
+
+function atualizarLote() {
+  const el = $('qtdMarc');
+  if (el) el.textContent = marcadas.size ? `${marcadas.size} marcada${marcadas.size > 1 ? 's' : ''}` : 'Nenhuma marcada';
+}
+
+/* ---------------- gravação ---------------- */
+
+let toastT = null;
+function toast(txt, erro) {
+  const t = $('toast');
+  $('toastTxt').textContent = txt;
+  t.classList.toggle('erro', !!erro);
+  t.classList.add('on');
+  clearTimeout(toastT);
+  toastT = setTimeout(() => t.classList.remove('on'), erro ? 4000 : 1400);
+}
+
+async function alternar(f) {
+  f.selecionada = !f.selecionada;
+  pintarGrade();
+  const { error } = await sb.from('fotos')
+    .update({ selecionada: f.selecionada, curada_em: new Date().toISOString() })
+    .eq('id', f.id);
+  if (error) { f.selecionada = !f.selecionada; pintarGrade(); toast('Não consegui salvar', true); return; }
+  toast(f.selecionada ? 'Incluída' : 'Removida');
+  atualizarContadores();
+}
+
+async function definirTipo(f, acaoId) {
+  const antes = f.acao_id;
+  f.acao_id = acaoId || null;
+  // classificar implica incluir: ninguem classifica foto que vai descartar
+  if (f.acao_id && !f.selecionada) f.selecionada = true;
+  pintarGrade();
+  const { error } = await sb.from('fotos')
+    .update({ acao_id: f.acao_id, selecionada: f.selecionada, curada_em: new Date().toISOString() })
+    .eq('id', f.id);
+  if (error) { f.acao_id = antes; pintarGrade(); toast('Não consegui salvar', true); return; }
+  toast('Tipo definido');
+  atualizarContadores();
+}
+
+async function aplicarLote(campos) {
+  if (!marcadas.size) { toast('Marque fotos com shift + clique', true); return; }
+  const ids = [...marcadas];
+  ids.forEach(id => {
+    const f = fotos.find(x => x.id === id);
+    if (!f) return;
+    if ('acao_id' in campos) { f.acao_id = campos.acao_id; f.selecionada = true; }
+    if ('selecionada' in campos) f.selecionada = campos.selecionada;
+  });
+  pintarGrade();
+  const payload = { curada_em: new Date().toISOString() };
+  if ('acao_id' in campos) { payload.acao_id = campos.acao_id; payload.selecionada = true; }
+  if ('selecionada' in campos) payload.selecionada = campos.selecionada;
+  const { error } = await sb.from('fotos').update(payload).in('id', ids);
+  toast(error ? 'Não consegui salvar' : `${ids.length} atualizadas`, !!error);
+  marcadas.clear(); atualizarLote(); pintarGrade(); atualizarContadores();
+}
+
+async function salvarOrdem() {
+  const ups = fotos.map((f, i) => ({ id: f.id, ordem_secao: i }));
+  for (const u of ups) await sb.from('fotos').update({ ordem_secao: u.ordem_secao }).eq('id', u.id);
+  toast('Ordem salva');
+}
+
+async function atualizarContadores() {
+  await carregarPromotores();
+  const nSel = fotos.filter(f => f.selecionada).length;
+  const nCamp = fotos.filter(f => f.selecionada && secaoDe(f.acao_id) === 'campanha').length;
+  const nConq = fotos.filter(f => f.selecionada && secaoDe(f.acao_id) === 'conquista').length;
+  const sub = document.querySelector('.cab .sub');
+  if (sub) sub.textContent = [atual.praca, `${fotos.length} recebidas`, `${nSel} no relatório`].filter(Boolean).join(' · ');
+  const pills = document.querySelectorAll('.cab .pill');
+  if (pills[0]) pills[0].textContent = `${nCamp} em campanhas`;
+  if (pills[1]) pills[1].textContent = `${nConq} em conquistas`;
+}
+
+/* ---------------- descrições ---------------- */
+
+async function carregarDescricoes() {
+  const { data } = await sb.from('relatorio_descricoes')
+    .select('secao, texto')
+    .eq('promotor_id', atual.promotor_id)
+    .eq('mes_referencia', mesSel());
+  const m = Object.fromEntries((data || []).map(d => [d.secao, d.texto]));
+  if ($('descCampanha'))  $('descCampanha').value  = m.campanha  || '';
+  if ($('descConquista')) $('descConquista').value = m.conquista || '';
+}
+
+async function salvarDescricao(secao, texto) {
+  if (!atual) return;
+  const { error } = await sb.from('relatorio_descricoes').upsert({
+    marca_id: perfil.marca_id, promotor_id: atual.promotor_id,
+    mes_referencia: mesSel(), secao, texto: texto.trim(), editada_por: (await sb.auth.getUser()).data.user.id
+  }, { onConflict: 'marca_id,promotor_id,mes_referencia,secao' });
+  if (error) toast('Não consegui salvar o texto', true);
+}
+
+async function sugerir(secao) {
+  const { data, error } = await sb.rpc('sugerir_descricao', {
+    p_promotor: atual.promotor_id, p_mes: mesSel(), p_secao: secao
+  });
+  if (error || !data) { toast('Classifique as fotos primeiro', true); return; }
+  const campo = secao === 'campanha' ? $('descCampanha') : $('descConquista');
+  campo.value = data;
+  salvarDescricao(secao, data);
+  toast('Sugestão aplicada');
+}
+
+/* ---------------- teclado ---------------- */
+
+addEventListener('keydown', e => {
+  if (!atual || !fotos.length) return;
+  if (['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) return;
+
+  if (e.key === 'ArrowRight') { foco = Math.min(foco + 1, fotos.length - 1); realcar(); e.preventDefault(); }
+  if (e.key === 'ArrowLeft')  { foco = Math.max(foco - 1, 0);                realcar(); e.preventDefault(); }
+  if (e.key === ' ' && foco >= 0) { alternar(fotos[foco]); e.preventDefault(); }
+  if (/^[1-9]$/.test(e.key) && foco >= 0) {
+    const t = tipos[Number(e.key) - 1];
+    if (t) definirTipo(fotos[foco], t.id);
+  }
+});
+
+function realcar() {
+  document.querySelectorAll('.cel').forEach((c, i) => c.classList.toggle('foco', i === foco));
+  const el = document.querySelector(`.cel[data-i="${foco}"]`);
+  if (el) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
