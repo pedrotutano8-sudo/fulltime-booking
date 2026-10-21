@@ -92,7 +92,9 @@
     font-size: 32px; font-weight: 600; letter-spacing: -0.005em;
     line-height: 1.125; margin: 0 0 6px;
   }
-  .card-login h1 img { height: 46px; width: auto; display: block; }
+  .card-login h1 .logo-ft { gap: 12px; }
+  .card-login h1 .logo-ft img { width: 46px; height: 46px; }
+  .card-login h1 .logo-ft span { font-size: 26px; }
   .card-login .sub { color: var(--text-2); font-size: 15px; margin: 0 0 30px; }
   .cliente-login {
     display: flex; align-items: center; justify-content: center; gap: 10px;
@@ -175,11 +177,14 @@
     70%  { box-shadow: 0 0 0 9px transparent; }
     100% { box-shadow: 0 0 0 0 transparent; }
   }
-  .logo-ft { height: 34px; width: auto; display: block; flex: none; }
+  .logo-ft { display: inline-flex; align-items: center; gap: 9px; flex: none; }
+  .logo-ft img { width: 34px; height: 34px; display: block; }
+  .logo-ft span {
+    font-size: 19px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--text); line-height: 1; white-space: nowrap;
+  }
   .logo-cliente { height: 34px; width: auto; display: block; flex: none; border-radius: 4px; }
   .sep-cliente { width: 1px; height: 26px; background: var(--border-strong); margin: 0 4px; }
-  /* o contorno do logo é escuro: no tema escuro vira branco e o vermelho continua vermelho */
-  @media (prefers-color-scheme: dark) { .logo-ft { filter: invert(1) hue-rotate(180deg); } }
 
   .topo-acoes { display: flex; align-items: center; gap: 10px; }
   .quem { font-size: 14px; color: var(--text-2); letter-spacing: -0.016em; }
@@ -412,7 +417,9 @@
     .marca { display: contents; }
     .marca .pt { margin-right: auto; }
     .abas { order: 3; flex-basis: 100%; justify-content: center; margin-left: 0; }
-    .logo-ft, .logo-cliente { height: 26px; }
+    .logo-ft img { width: 28px; height: 28px; }
+    .logo-ft span { font-size: 16px; }
+    .logo-cliente { height: 26px; }
     .sep-cliente { display: none; }
   }
 
@@ -426,7 +433,7 @@
 <!-- ===================== LOGIN ===================== -->
 <div id="login">
   <div class="card-login">
-    <h1><img src="./marca/fulltime.png" class="logo-ft" alt="Full Time Trade Marketing"></h1>
+    <h1><span class="logo-ft"><img src="./marca/icone.png" alt=""><span>Full Time</span></span></h1>
     <p class="sub">Acompanhamento de PDV ao vivo</p>
 
     <form id="fLogin">
@@ -450,7 +457,7 @@
   <header class="topo">
     <div class="wrap topo-in">
       <div class="marca">
-        <img src="./marca/fulltime.png" class="logo-ft" alt="Full Time Trade Marketing">
+        <span class="logo-ft"><img src="./marca/icone.png" alt=""><span>Full Time</span></span>
         <span class="pt" title="Recebendo ao vivo"></span>
         <nav class="abas">
           <a href="./" class="on">Ao vivo</a>

@@ -62,7 +62,9 @@
     box-shadow: var(--shadow-lg); padding: 40px 36px;
   }
   .card-login h1 { font-size: 30px; font-weight: 600; letter-spacing: -0.005em; margin: 0 0 6px; }
-  .card-login h1 img { height: 46px; width: auto; display: block; }
+  .card-login h1 .logo-ft { gap: 12px; }
+  .card-login h1 .logo-ft img { width: 46px; height: 46px; }
+  .card-login h1 .logo-ft span { font-size: 26px; }
   .card-login .sub { color: var(--text-2); font-size: 15px; margin: 0 0 30px; }
   .cliente-login {
     display: flex; align-items: center; justify-content: center; gap: 10px;
@@ -167,11 +169,14 @@
     display: flex; align-items: center; justify-content: space-between; gap: 20px;
   }
   .marca { display: flex; align-items: center; gap: 14px; min-width: 0; }
-  .logo-ft { height: 34px; width: auto; display: block; flex: none; }
+  .logo-ft { display: inline-flex; align-items: center; gap: 9px; flex: none; }
+  .logo-ft img { width: 34px; height: 34px; display: block; }
+  .logo-ft span {
+    font-size: 19px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--text); line-height: 1; white-space: nowrap;
+  }
   .logo-cliente { height: 34px; width: auto; display: block; flex: none; border-radius: 4px; }
   .sep-cliente { width: 1px; height: 26px; background: var(--border-strong); margin: 0 4px; }
-  /* o contorno do logo é escuro: no tema escuro vira branco e o vermelho continua vermelho */
-  @media (prefers-color-scheme: dark) { .logo-ft { filter: invert(1) hue-rotate(180deg); } }
   .abas { display: flex; gap: 2px; background: var(--surface); border-radius: 980px; padding: 3px; }
   .abas a {
     text-decoration: none; color: var(--text-2); font-size: 14px; font-weight: 500;
@@ -353,7 +358,9 @@
     aside.aberta { display: block; position: fixed; inset: 56px 0 0 0; z-index: 30; }
     header.topo { flex-wrap: wrap; row-gap: 10px; padding: 10px 16px; }
     .topo-dir { flex-wrap: wrap; }
-    .logo-ft, .logo-cliente { height: 26px; }
+    .logo-ft img { width: 28px; height: 28px; }
+    .logo-ft span { font-size: 16px; }
+    .logo-cliente { height: 26px; }
     .sep-cliente { display: none; }
   }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
@@ -363,7 +370,7 @@
 
 <div id="login">
   <div class="card-login">
-    <h1><img src="./marca/fulltime.png" class="logo-ft" alt="Full Time Trade Marketing"></h1>
+    <h1><span class="logo-ft"><img src="./marca/icone.png" alt=""><span>Full Time</span></span></h1>
     <p class="sub">Curadoria das fotos do Ação no Trade</p>
     <form id="fLogin">
       <div class="campo"><label for="email">E-mail</label><input class="inp" id="email" type="email" autocomplete="email" required></div>
@@ -378,7 +385,7 @@
 <div id="app">
   <header class="topo">
     <div class="marca">
-      <img src="./marca/fulltime.png" class="logo-ft" alt="Full Time Trade Marketing">
+      <span class="logo-ft"><img src="./marca/icone.png" alt=""><span>Full Time</span></span>
       <nav class="abas">
         <a href="./" >Ao vivo</a>
         <a href="./curadoria.html" class="on">Curadoria</a>
