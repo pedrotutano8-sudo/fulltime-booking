@@ -5,7 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
-<title>Booking ao Vivo</title>
+<title>Ao vivo · Full Time Trade Marketing</title>
+<link rel="icon" href="./marca/icone.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
   :root {
@@ -14,8 +18,8 @@
     --elevated: #FBFBFD;
     --text: #1D1D1F;
     --text-2: #86868B;
-    --accent: #0071E3;
-    --accent-press: #0058B9;
+    --accent: #B72924;
+    --accent-press: #93201C;
     --border: rgba(0,0,0,0.06);
     --border-strong: rgba(0,0,0,0.12);
     --ok: #17853F;
@@ -38,8 +42,8 @@
       --elevated: #2C2C2E;
       --text: #F5F5F7;
       --text-2: #A1A1A6;
-      --accent: #2997FF;
-      --accent-press: #0071E3;
+      --accent: #E0463F;
+      --accent-press: #B72924;
       --border: rgba(255,255,255,0.08);
       --border-strong: rgba(255,255,255,0.18);
       --ok: #34C759;
@@ -59,8 +63,8 @@
   html, body {
     margin: 0; padding: 0;
     background: var(--bg); color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: 17px; line-height: 1.47; letter-spacing: -0.022em;
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 16px; line-height: 1.5; letter-spacing: -0.01em;
     -webkit-font-smoothing: antialiased;
   }
 
@@ -88,7 +92,14 @@
     font-size: 32px; font-weight: 600; letter-spacing: -0.005em;
     line-height: 1.125; margin: 0 0 6px;
   }
+  .card-login h1 img { height: 46px; width: auto; display: block; }
   .card-login .sub { color: var(--text-2); font-size: 15px; margin: 0 0 30px; }
+  .cliente-login {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    margin-top: 26px; padding-top: 20px; border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--text-2); text-transform: uppercase; letter-spacing: .06em;
+  }
+  .cliente-login img { height: 28px; width: auto; border-radius: 3px; }
 
   label {
     display: block;
@@ -150,7 +161,7 @@
   }
   .topo-in {
     display: flex; align-items: center; justify-content: space-between; gap: 20px;
-    padding: 14px 0;
+    padding-top: 14px; padding-bottom: 14px;
   }
   .marca { display: flex; align-items: center; gap: 11px; min-width: 0; }
   .marca .pt {
@@ -164,8 +175,11 @@
     70%  { box-shadow: 0 0 0 9px transparent; }
     100% { box-shadow: 0 0 0 0 transparent; }
   }
-  .marca .tt { font-size: 19px; font-weight: 600; letter-spacing: -0.022em; }
-  .marca .st { font-size: 12px; color: var(--text-2); letter-spacing: 0; }
+  .logo-ft { height: 34px; width: auto; display: block; flex: none; }
+  .logo-cliente { height: 34px; width: auto; display: block; flex: none; border-radius: 4px; }
+  .sep-cliente { width: 1px; height: 26px; background: var(--border-strong); margin: 0 4px; }
+  /* o contorno do logo é escuro: no tema escuro vira branco e o vermelho continua vermelho */
+  @media (prefers-color-scheme: dark) { .logo-ft { filter: invert(1) hue-rotate(180deg); } }
 
   .topo-acoes { display: flex; align-items: center; gap: 10px; }
   .quem { font-size: 14px; color: var(--text-2); letter-spacing: -0.016em; }
@@ -393,6 +407,13 @@
     .grade { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); }
     .v-topo { flex-direction: column; }
     .quem { display: none; }
+    /* topo em duas linhas: logos e Sair em cima, abas embaixo */
+    .topo-in { flex-wrap: wrap; row-gap: 10px; padding-top: 10px; padding-bottom: 10px; }
+    .marca { display: contents; }
+    .marca .pt { margin-right: auto; }
+    .abas { order: 3; flex-basis: 100%; justify-content: center; margin-left: 0; }
+    .logo-ft, .logo-cliente { height: 26px; }
+    .sep-cliente { display: none; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -405,8 +426,8 @@
 <!-- ===================== LOGIN ===================== -->
 <div id="login">
   <div class="card-login">
-    <h1>Booking ao Vivo</h1>
-    <p class="sub">Acompanhamento de PDV — FullTime TradeMarketing</p>
+    <h1><img src="./marca/fulltime.png" class="logo-ft" alt="Full Time Trade Marketing"></h1>
+    <p class="sub">Acompanhamento de PDV ao vivo</p>
 
     <form id="fLogin">
       <div class="campo">
@@ -420,6 +441,7 @@
       <button class="btn full" type="submit" id="btnEntrar">Entrar</button>
       <div class="msg-erro" id="erroLogin"></div>
     </form>
+    <div class="cliente-login">Cliente <img src="./marca/mann-filter.png" alt="Mann Filter"></div>
   </div>
 </div>
 
@@ -428,11 +450,8 @@
   <header class="topo">
     <div class="wrap topo-in">
       <div class="marca">
+        <img src="./marca/fulltime.png" class="logo-ft" alt="Full Time Trade Marketing">
         <span class="pt" title="Recebendo ao vivo"></span>
-        <span>
-          <span class="tt">Booking ao Vivo</span>
-          <span class="st" id="stMarca">Mann Filter</span>
-        </span>
         <nav class="abas">
           <a href="./" class="on">Ao vivo</a>
           <a href="./curadoria.html">Curadoria</a>
@@ -441,6 +460,8 @@
       <div class="topo-acoes">
         <span class="quem" id="quem"></span>
         <button class="btn sutil" id="btnSair" type="button">Sair</button>
+        <span class="sep-cliente"></span>
+        <img src="./marca/mann-filter.png" class="logo-cliente" alt="Mann Filter">
       </div>
     </div>
   </header>

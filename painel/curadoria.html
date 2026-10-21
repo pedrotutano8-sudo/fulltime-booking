@@ -5,13 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
-<title>Curadoria do Relatório</title>
+<title>Curadoria · Full Time Trade Marketing</title>
+<link rel="icon" href="./marca/icone.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
   :root {
     --bg: #FFFFFF; --surface: #F5F5F7; --elevated: #FBFBFD;
     --text: #1D1D1F; --text-2: #86868B;
-    --accent: #0071E3; --accent-press: #0058B9;
+    --accent: #B72924; --accent-press: #93201C;
     --border: rgba(0,0,0,0.06); --border-strong: rgba(0,0,0,0.12);
     --ok: #17853F; --ok-bg: rgba(23,133,63,.10);
     --warn: #B25000; --warn-bg: rgba(178,80,0,.10);
@@ -28,7 +32,7 @@
     :root {
       --bg: #000000; --surface: #1C1C1E; --elevated: #2C2C2E;
       --text: #F5F5F7; --text-2: #A1A1A6;
-      --accent: #2997FF; --accent-press: #0071E3;
+      --accent: #E0463F; --accent-press: #B72924;
       --border: rgba(255,255,255,0.08); --border-strong: rgba(255,255,255,0.18);
       --ok: #34C759; --ok-bg: rgba(52,199,89,.14);
       --warn: #FF9F0A; --warn-bg: rgba(255,159,10,.14);
@@ -44,8 +48,8 @@
   * { box-sizing: border-box; }
   html, body {
     margin: 0; padding: 0; background: var(--bg); color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: 17px; line-height: 1.47; letter-spacing: -0.022em;
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 16px; line-height: 1.5; letter-spacing: -0.01em;
     -webkit-font-smoothing: antialiased;
   }
   button, input, select, textarea { font: inherit; }
@@ -58,7 +62,14 @@
     box-shadow: var(--shadow-lg); padding: 40px 36px;
   }
   .card-login h1 { font-size: 30px; font-weight: 600; letter-spacing: -0.005em; margin: 0 0 6px; }
+  .card-login h1 img { height: 46px; width: auto; display: block; }
   .card-login .sub { color: var(--text-2); font-size: 15px; margin: 0 0 30px; }
+  .cliente-login {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    margin-top: 26px; padding-top: 20px; border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--text-2); text-transform: uppercase; letter-spacing: .06em;
+  }
+  .cliente-login img { height: 28px; width: auto; border-radius: 3px; }
   label { display: block; font-size: 12px; color: var(--text-2); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 7px; }
   .inp {
     width: 100%; background: var(--surface); border: 1px solid var(--border);
@@ -155,8 +166,12 @@
     padding: 12px 24px;
     display: flex; align-items: center; justify-content: space-between; gap: 20px;
   }
-  .marca { display: flex; align-items: baseline; gap: 12px; min-width: 0; }
-  .marca .tt { font-size: 19px; font-weight: 600; letter-spacing: -0.022em; white-space: nowrap; }
+  .marca { display: flex; align-items: center; gap: 14px; min-width: 0; }
+  .logo-ft { height: 34px; width: auto; display: block; flex: none; }
+  .logo-cliente { height: 34px; width: auto; display: block; flex: none; border-radius: 4px; }
+  .sep-cliente { width: 1px; height: 26px; background: var(--border-strong); margin: 0 4px; }
+  /* o contorno do logo é escuro: no tema escuro vira branco e o vermelho continua vermelho */
+  @media (prefers-color-scheme: dark) { .logo-ft { filter: invert(1) hue-rotate(180deg); } }
   .abas { display: flex; gap: 2px; background: var(--surface); border-radius: 980px; padding: 3px; }
   .abas a {
     text-decoration: none; color: var(--text-2); font-size: 14px; font-weight: 500;
@@ -336,6 +351,10 @@
     .corpo { grid-template-columns: 1fr; }
     aside { display: none; }
     aside.aberta { display: block; position: fixed; inset: 56px 0 0 0; z-index: 30; }
+    header.topo { flex-wrap: wrap; row-gap: 10px; padding: 10px 16px; }
+    .topo-dir { flex-wrap: wrap; }
+    .logo-ft, .logo-cliente { height: 26px; }
+    .sep-cliente { display: none; }
   }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
@@ -344,21 +363,22 @@
 
 <div id="login">
   <div class="card-login">
-    <h1>Curadoria</h1>
-    <p class="sub">Seleção de fotos do Ação no Trade</p>
+    <h1><img src="./marca/fulltime.png" class="logo-ft" alt="Full Time Trade Marketing"></h1>
+    <p class="sub">Curadoria das fotos do Ação no Trade</p>
     <form id="fLogin">
       <div class="campo"><label for="email">E-mail</label><input class="inp" id="email" type="email" autocomplete="email" required></div>
       <div class="campo"><label for="senha">Senha</label><input class="inp" id="senha" type="password" autocomplete="current-password" required></div>
       <button class="btn full" type="submit" id="btnEntrar">Entrar</button>
       <div class="msg-erro" id="erroLogin"></div>
     </form>
+    <div class="cliente-login">Cliente <img src="./marca/mann-filter.png" alt="Mann Filter"></div>
   </div>
 </div>
 
 <div id="app">
   <header class="topo">
     <div class="marca">
-      <span class="tt">Curadoria</span>
+      <img src="./marca/fulltime.png" class="logo-ft" alt="Full Time Trade Marketing">
       <nav class="abas">
         <a href="./" >Ao vivo</a>
         <a href="./curadoria.html" class="on">Curadoria</a>
@@ -369,6 +389,8 @@
       <button class="btn" id="btnGerar" type="button">Gerar Booking</button>
       <span class="quem" id="quem"></span>
       <button class="btn sutil" id="btnSair" type="button">Sair</button>
+      <span class="sep-cliente"></span>
+      <img src="./marca/mann-filter.png" class="logo-cliente" alt="Mann Filter">
     </div>
   </header>
 
