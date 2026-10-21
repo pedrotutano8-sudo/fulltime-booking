@@ -665,15 +665,22 @@ async function assinar() {
   }));
   if (!chaves.length) { window.URLS = {}; return; }
 
-  try {
-    const { data: { session } } = await sb.auth.getSession();
-    const r = await fetch(CFG.urlsAssinadas, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
-      body: JSON.stringify({ keys: [...new Set(chaves)] })
-    });
-    window.URLS = r.ok ? await r.json() : {};
-  } catch (e) { window.URLS = {}; }
+  try { window.URLS = await assinarEmLotes(chaves); }
+  catch (e) { window.URLS = {}; }
+}
+
+// o webhook do n8n aceita no máximo 300 chaves por pedido: assina em lotes e junta as respostas
+async function assinarEmLotes(chaves) {
+  const { data: { session } } = await sb.auth.getSession();
+  const unicas = [...new Set(chaves)];
+  const lotes = [];
+  for (let i = 0; i < unicas.length; i += 300) lotes.push(unicas.slice(i, i + 300));
+  const partes = await Promise.all(lotes.map(keys => fetch(CFG.urlsAssinadas, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+    body: JSON.stringify({ keys })
+  }).then(r => r.ok ? r.json() : {}).catch(() => ({}))));
+  return Object.assign({}, ...partes);
 }
 
 /* ---------------- kpis ---------------- */
@@ -734,12 +741,13 @@ function pintarFeed(idNovo) {
     const pdv = v.pdvs || {};
     const local = [pdv.cidade, pdv.uf].filter(Boolean).join(' · ');
     const rede = pdv.redes && pdv.redes.nome;
-    const fotos = (v.fotos || []).sort((a, b) => new Date(a.criado_em) - new Date(b.criado_em));
+    const fotos = (v.fotos || []).sort((a, b) =>
+      new Date(a.capturada_em || a.criado_em) - new Date(b.capturada_em || b.criado_em));
 
     const meta = [
       v.promotores && v.promotores.nome,
       [rede, local].filter(Boolean).join(' · '),
-      `${dia(v.data_visita)} às ${hora(v.criado_em)}`,
+      `${dia(v.data_visita)} às ${hora(fotos[0]?.capturada_em || v.criado_em)}`,
       v.acoes && v.acoes.nome
     ].filter(Boolean);
 

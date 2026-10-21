@@ -571,15 +571,22 @@ async function carregarFotos() {
 async function assinar() {
   const keys = fotos.map(f => f.r2_key_thumb || f.r2_key_original).filter(Boolean);
   if (!keys.length) { urls = {}; return; }
-  try {
-    const { data: { session } } = await sb.auth.getSession();
-    const r = await fetch(CFG.urlsAssinadas, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
-      body: JSON.stringify({ keys: [...new Set(keys)] })
-    });
-    urls = r.ok ? await r.json() : {};
-  } catch (e) { urls = {}; }
+  try { urls = await assinarEmLotes(keys); }
+  catch (e) { urls = {}; }
+}
+
+// o webhook do n8n aceita no máximo 300 chaves por pedido: assina em lotes e junta as respostas
+async function assinarEmLotes(chaves) {
+  const { data: { session } } = await sb.auth.getSession();
+  const unicas = [...new Set(chaves)];
+  const lotes = [];
+  for (let i = 0; i < unicas.length; i += 300) lotes.push(unicas.slice(i, i + 300));
+  const partes = await Promise.all(lotes.map(keys => fetch(CFG.urlsAssinadas, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+    body: JSON.stringify({ keys })
+  }).then(r => r.ok ? r.json() : {}).catch(() => ({}))));
+  return Object.assign({}, ...partes);
 }
 
 /* ---------------- render ---------------- */
